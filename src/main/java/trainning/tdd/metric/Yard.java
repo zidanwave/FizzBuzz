@@ -5,12 +5,16 @@ package trainning.tdd.metric;
  */
 public class Yard {
 
-    private final int yardNumber;
-    public Yard(int yardNumber) {
+    private final double yardNumber;
+    public Yard(double yardNumber) {
         this.yardNumber = yardNumber;
     }
 
-    public int toFoots(){
-        return yardNumber * 3;
+    public double toFoots(){
+        return yardNumber * 3.0;
+    }
+
+    public double toInches() {
+        return new Foot(this.toFoots()).toInches();
     }
 }

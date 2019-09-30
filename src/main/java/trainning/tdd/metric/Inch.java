@@ -5,15 +5,17 @@ package trainning.tdd.metric;
  */
 public class Inch {
 
-    private final int inchNumber;
+    private final double inchNumber;
 
-    public Inch(int inchNumber) {
+    public Inch(double inchNumber) {
         this.inchNumber = inchNumber;
-
     }
 
-    public int toFoots() {
-        return inchNumber / 12;
+    public double toFoots() {
+        return inchNumber / 12.0;
     }
 
+    public double toYards() {
+        return new Foot(this.toFoots()).toYards();
+    }
 }
