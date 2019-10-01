@@ -17,32 +17,32 @@ import org.testng.annotations.Test;
 
 public class TestMetric {
     @Test
-    public void check_1_foot_12_inch() {
+    public void check_foot_to_inch() {
         Assert.assertEquals(new Foot(1).toInches(), 1 * 12.0);
     }
 
     @Test
-    public void check_1_yard_3_foot() {
+    public void check_yard_to_foot() {
         Assert.assertEquals(new Yard(1).toFoots(), 1 * 3.0);
     }
 
     @Test
-    public void check_1_yard_36_inch() {
+    public void check_yard_to_inch() {
         Assert.assertEquals(new Yard(1).toInches(), 1 * 3 * 12.0);
     }
 
     @Test
-    public void check_1_inch_foot() {
+    public void check_inch_to_foot() {
         Assert.assertEquals(new Inch(1).toFoots(), 1.0/12);
     }
 
     @Test
-    public void check_1_foot_yard() {
+    public void check_foot_to_yard() {
         Assert.assertEquals(new Foot(1).toYards(), 1.0/3);
     }
 
     @Test
-    public void check_1_inch_yard() {
+    public void check_inch_to_yard() {
         Assert.assertEquals(new Inch(1).toYards(), 1/12.0/3);
     }
 
