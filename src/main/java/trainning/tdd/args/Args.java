@@ -1,16 +1,20 @@
 package trainning.tdd.args;
 
 /**
- * Created by chenzi on 2019/10/15.
+ * @ClassName Args
+ * @Description TODO
+ * @Author chenzi
+ * @Date 2019/10/18
+ * @Version 1.0
  */
 public class Args {
-    private final Command command;
+    private Command command;
 
-    public Args(String config, String cmdLine) {
-        this.command = new Command(new Schemas(config), cmdLine);
+    public Args(String config, String command) {
+        this.command = new Command(new Schemas(config), command);
     }
 
-    public Object get(String key) {
+    public Object getValue(String key) {
         return command.getValue(key);
     }
 }

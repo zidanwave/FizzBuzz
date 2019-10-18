@@ -2,45 +2,30 @@ package trainning.tdd.args;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.ListIterator;
 import java.util.Map;
 
 /**
- * Created by chenzi on 2019/10/14.
+ * @ClassName Schemas
+ * @Description TODO
+ * @Author chenzi
+ * @Date 2019/10/18
+ * @Version 1.0
  */
 public class Schemas {
     private final String config;
-    private Map<String, String> configMap;
-
+    private Map<String, String> configMap = null;
 
     public Schemas(String config) {
         this.config = config;
-        this.configMap = new HashMap<>();
-
-        ListIterator it = Arrays.asList(config.split(" ")).listIterator();
-        while(it.hasNext()) {
-            String[] keyPair = it.next().toString().split(":");
-            configMap.put(keyPair[0], keyPair[1]);
+        configMap = new HashMap<>();
+        for (String keyDefStr:Arrays.asList(config.split(" "))) {
+            String[] keyDefPair = keyDefStr.split(":");
+            configMap.put(keyDefPair[0], keyDefPair[1]);
         }
     }
 
-    public String getType(String key) {
+    public String getDefine(String key) {
         return configMap.get(key);
-    }
-
-    public Object getValue(String key, String def) {
-        switch (configMap.get(key)) {
-            case "bool": return "true".equals(def);
-            case "int": return Integer.valueOf(def);
-            case "str": return def;
-            case "list": return def.split(",");
-            default:return def;
-
-        }
-    }
-
-    private boolean isInteger(String value) {
-        return value.matches("^[0-9]\\d*$");
     }
 
     public boolean containsKey(String key) {

@@ -6,49 +6,53 @@ import java.util.ListIterator;
 import java.util.Map;
 
 /**
- * Created by chenzi on 2019/10/15.
+ * @ClassName Command
+ * @Description TODO
+ * @Author chenzi
+ * @Date 2019/10/18
+ * @Version 1.0
  */
 public class Command {
-    private final String cmdLine;
-    private Map<String, String> cmdMap;
     private Schemas schemas;
+    private Map<String, String> cmdMap = null;
 
-    public Command(Schemas schemas, String cmdLine) {
-        this.cmdLine = cmdLine;
-        this.cmdMap = new HashMap<>();
+    public Command(Schemas schemas, String command) {
         this.schemas = schemas;
+        this.cmdMap = new HashMap<>();
 
-        ListIterator<String> it = Arrays.asList(this.cmdLine.split(" ")).listIterator();
-        while(it.hasNext()) {
-            String keyOrValue = it.next().toString();
-            if (keyOrValue.startsWith("-")) {
-                String key = keyOrValue.substring(1);
-                String value = it.hasNext()?it.next().toString():null;
-                //在Command不知道命令行数据格式定义的情况下，处理参数为负数的逻辑是多余的。格式的定义在Schemas，Command的行为是依赖于Schemas的
-                if (this.schemas.containsKey(key)){
-                    if (null == value){
-                        this.cmdMap.put(key, value);
-                    }
-                    else if ((value.startsWith("-")) && (this.schemas.containsKey(value.substring(1)))) {
-                        this.cmdMap.put(key, null);
-                        it.previous();
+        ListIterator lit = Arrays.asList(command.split(" ")).listIterator();
+        while(lit.hasNext()){
+            String commandDataStr = lit.next().toString();
+            if (commandDataStr.startsWith("-")) {
+                String name = commandDataStr.substring(1);
+                if (schemas.containsKey(name)) {
+                    if (lit.hasNext()) {
+                        String value = lit.next().toString();
+                        if (value.startsWith("-") && schemas.containsKey(value.substring(1))){
+                            lit.previous();
+                        }else {
+                            cmdMap.put(name, value);
+                        }
                     }else{
-                        this.cmdMap.put(key, value);
+                        cmdMap.put(name, null);
                     }
                 }
             }
         }
+
     }
 
-    private boolean isInteger(String value) {
-        return value.matches("^[0-9]\\d*$");
-    }
-
-    public String getRawValue(String key) {
-        return this.cmdMap.get(key);
+    public String getRawValue(String key){
+        return cmdMap.get(key);
     }
 
     public Object getValue(String key) {
-        return this.schemas.getValue(key, getRawValue(key));
+        switch (schemas.getDefine(key)){
+            case "bool": return "true".equals(getRawValue(key));
+            case "int": return Integer.valueOf(getRawValue(key));
+            case "str": return getRawValue(key);
+            case "list": return getRawValue(key).split(",");
+            default: return getRawValue(key);
+        }
     }
 }

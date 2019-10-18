@@ -3,62 +3,45 @@ package trainning.tdd.args;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.util.Arrays;
-
 /**
- * Created by chenzi on 2019/10/14.
- */
-/**
- * 任务分解：
- * 1. 测试只有一个参数时的情况
- * 1.1 "l:true"，创建Schemas，直接返回 TRUE
- * 1.2 "p:int"，测试不通过时重构Schemas，使其更通用
- * 1.3 其它一个参数时的情况
- * 2. 测试常见参数时的情况，"l:bool p:int d:str g:list"
- * 3. 测试数据解析
- * 3.1 get("l", "true")==true
- * 3.2 get("l", "false")==false
- * 3.3 get("l", null)==false
- * 3.4 get("p", "8080")==8080
- * 3.5 get("d", "/usr/local")=="/usr/local"
- * 3.6 get("g", "this,is,a,list")==["this","is","a","list"]
+ * @ClassName SchemasTest
+ * @Description TODO
+ * 1. Schemas：读取命令参数格式定义，并提供与参数格式相关功能，如数据类型转换、是否存在某种参数等
+ * 1.1 能单独识别一个参数定义的情况，分别是bool，str，int，list
+ * 1.2 能识别多个参数组合的情况，如：l:bool p:int d:str g:list
+ *
+ * 耗时：14:11
+ * @Author chenzi
+ * @Date 2019/10/18
+ * @Version 1.0
  */
 public class SchemasTest {
     @Test
-    public void test_schemas_bool(){
-        Schemas sc = new Schemas("l:bool");
-        Assert.assertEquals(sc.getType("l"), "bool");
-    }
-    @Test
-    public void test_schemas_int(){
-        Schemas sc = new Schemas("p:int");
-        Assert.assertEquals(sc.getType("p"), "int");
-    }
-    @Test
-    public void test_schemas_str(){
-        Schemas sc = new Schemas("d:str");
-        Assert.assertEquals(sc.getType("d"), "str");
+    public void test_schemas_l(){
+        Assert.assertEquals(new Schemas("l:bool").getDefine("l"), "bool");
     }
 
     @Test
-    public void test_schemas_normal_config(){
-        Schemas sc = new Schemas("l:bool p:int d:str g:list");
-        Assert.assertEquals(sc.getType("l"), "bool");
-        Assert.assertEquals(sc.getType("p"), "int");
-        Assert.assertEquals(sc.getType("d"), "str");
-        Assert.assertEquals(sc.getType("g"), "list");
+    public void test_schemas_d(){
+        Assert.assertEquals(new Schemas("d:str").getDefine("d"), "str");
     }
 
+    @Test
+    public void test_schemas_p(){
+        Assert.assertEquals(new Schemas("p:int").getDefine("p"), "int");
+    }
 
     @Test
-    public void test_schemas_get_value(){
-        Schemas sc = new Schemas("l:bool p:int d:str g:list");
-        Assert.assertEquals(sc.getValue("l", "true"), Boolean.TRUE);
-        Assert.assertEquals(sc.getValue("l", "false"), Boolean.FALSE);
-        Assert.assertEquals(sc.getValue("l", null), Boolean.FALSE);
-        Assert.assertEquals(sc.getValue("p", "8080"), 8080);
-        Assert.assertEquals(sc.getValue("d", "/usr/local"), "/usr/local");
-        Assert.assertEquals(Arrays.toString((String[])sc.getValue("g", "this,is,a,list")), "[this, is, a, list]");
+    public void test_schemas_combo_define(){
+        Schemas schemas = new Schemas("l:bool d:str p:int");
+        Assert.assertEquals(schemas.getDefine("l"), "bool");
+        Assert.assertEquals(schemas.getDefine("d"), "str");
+        Assert.assertEquals(schemas.getDefine("p"), "int");
+    }
+
+    @Test
+    public void test_schemas_g(){
+        Assert.assertEquals(new Schemas("g:list").getDefine("g"), "list");
     }
 
 }
