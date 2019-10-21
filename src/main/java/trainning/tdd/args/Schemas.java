@@ -12,16 +12,20 @@ import java.util.Map;
  * @Version 1.0
  */
 public class Schemas {
-    private final String config;
     private Map<String, String> configMap = null;
 
     public Schemas(String config) {
-        this.config = config;
         configMap = new HashMap<>();
         for (String keyDefStr:Arrays.asList(config.split(" "))) {
             String[] keyDefPair = keyDefStr.split(":");
-            configMap.put(keyDefPair[0], keyDefPair[1]);
+            if (keyDefPair.length>=2) {
+                configMap.put(keyDefPair[0], keyDefPair[1]);
+            }else{
+                configMap.put(keyDefPair[0], null);
+            }
         }
+        System.out.println("p:".split(":").length);
+
     }
 
     public String getDefine(String key) {

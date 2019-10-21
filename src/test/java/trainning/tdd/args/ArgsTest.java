@@ -50,10 +50,14 @@ public class ArgsTest {
     }
 
     @Test
-    public void test_args_combo_list(){
-        Assert.assertEquals(Arrays.asList((String[])new Args("g:list", "-g this,is,a,list").getValue("g")).toString(), "[this, is, a, list]");
-        Assert.assertEquals(Arrays.asList((String[])new Args("l:bool p:int d:str g:list", "-l -p -8080 -d /usr/local -g this,is,a,list").getValue("g")).toString(), "[this, is, a, list]");
+    public void test_args_combo_list_str(){
+        Assert.assertEquals(Arrays.asList((String[])new Args("g:list.str", "-g this,is,a,list").getValue("g")).toString(), "[this, is, a, list]");
+        Assert.assertEquals(Arrays.asList((String[])new Args("l:bool p:int d:str g:list.str", "-l -p -8080 -d /usr/local -g this,is,a,list").getValue("g")).toString(), "[this, is, a, list]");
     }
 
-
+    @Test
+    public void test_args_combo_list_int(){
+        Assert.assertEquals((int[])new Args("hi:list.int", "-hi 1,2,3,-4,6").getValue("hi"), new int[]{1, 2, 3, -4, 6});
+        Assert.assertEquals((int[])new Args("l:bool p:int d:str hi:list.int", "-l -p -8080 -d /usr/local -hi 1,2,3,-4,6").getValue("hi"), new int[]{1, 2, 3, -4, 6});
+    }
 }
