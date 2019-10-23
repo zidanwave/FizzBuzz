@@ -9,7 +9,7 @@ import java.util.Map;
  * @ClassName Command
  * @Description TODO
  * @Author chenzi
- * @Date 2019/10/18
+ * @Date 2019/10/21
  * @Version 1.0
  */
 public class Command {
@@ -18,44 +18,44 @@ public class Command {
 
     public Command(Schemas schemas, String command) {
         this.schemas = schemas;
-        this.cmdMap = new HashMap<>();
+        cmdMap = new HashMap<>();
 
         ListIterator lit = Arrays.asList(command.split(" ")).listIterator();
-        while(lit.hasNext()){
+        while(lit.hasNext()) {
             String key = lit.next().toString();
             if (isValidKey(schemas, key)) {
-                key = key.substring(1);
                 if (lit.hasNext()) {
                     String value = lit.next().toString();
                     if (isValidKey(schemas, value)){
                         lit.previous();
                     }else{
-                        cmdMap.put(key, value);
+                        cmdMap.put(key.substring(1), value);
                     }
-                }else{
-                    cmdMap.put(key, null);
+
+                } else {
+                    cmdMap.put(key.substring(1), null);
                 }
             }
         }
     }
 
-    private boolean isValidKey(Schemas schemas, String value) {
-        return value.startsWith("-") && schemas.containsKey(value.substring(1));
+    private boolean isValidKey(Schemas schemas, String key) {
+        return key.startsWith("-") && schemas.containsKey(key.substring(1));
     }
 
-    public String getRawValue(String key){
+    public String getRawValue(String key) {
         return cmdMap.get(key);
     }
 
     public Object getValue(String key) {
         switch (schemas.getDefine(key)){
-            case "bool": return "true".equals(getRawValue(key));
+            case "bool": return "true".equalsIgnoreCase(getRawValue(key));
             case "int": return Integer.valueOf(getRawValue(key));
             case "str": return getRawValue(key);
             case "list.str": return getRawValue(key).split(",");
-            case "list.int": return Arrays.asList(getRawValue(key).split(",")).stream().mapToInt(e -> Integer.valueOf(e)).toArray();
-            default: return getRawValue(key);
+            case "list.int": return Arrays.asList(getRawValue(key).split(",")).stream().mapToInt(e->Integer.valueOf(e)).toArray();
+            default: return null;
         }
-    }
 
+    }
 }

@@ -8,7 +8,7 @@ import java.util.Map;
  * @ClassName Schemas
  * @Description TODO
  * @Author chenzi
- * @Date 2019/10/18
+ * @Date 2019/10/21
  * @Version 1.0
  */
 public class Schemas {
@@ -16,20 +16,22 @@ public class Schemas {
 
     public Schemas(String config) {
         configMap = new HashMap<>();
-        for (String keyDefStr:Arrays.asList(config.split(" "))) {
-            String[] keyDefPair = keyDefStr.split(":");
-            if (keyDefPair.length>=2) {
-                configMap.put(keyDefPair[0], keyDefPair[1]);
+        Arrays.asList(config.split(" ")).stream().forEach(e -> {
+            String[] keyValue = e.split(":");
+            if(keyValue.length>1) {
+                configMap.put(keyValue[0], keyValue[1]);
             }else{
-                configMap.put(keyDefPair[0], null);
+                configMap.put(keyValue[0], null);
             }
-        }
-        System.out.println("p:".split(":").length);
-
+        });
     }
 
     public String getDefine(String key) {
-        return configMap.get(key);
+        if (configMap.containsKey(key)) {
+            return configMap.get(key);
+        }else{
+            return null;
+        }
     }
 
     public boolean containsKey(String key) {
