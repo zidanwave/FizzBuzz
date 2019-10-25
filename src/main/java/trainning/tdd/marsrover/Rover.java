@@ -1,32 +1,30 @@
 package trainning.tdd.marsrover;
 
-import trainning.tdd.args.Command;
-
 import java.awt.*;
-
-import static java.lang.Math.abs;
+import java.util.*;
+import java.util.List;
 
 /**
  * @ClassName Rover
  * @Description TODO
  * @Author chenzi
- * @Date 2019/10/23
+ * @Date 2019/10/25
  * @Version 1.0
  */
 public class Rover {
-    private Point pos = new Point(0,0);
-    private final Point area = new Point(0,0);
-
+    private final Point pos;
+    private final Point area;
     private Compass direction;
+    private List<Point> blocks;
 
     public Rover(int x, int y, int areaX, int areaY, Compass direction) {
-        this.pos.setLocation(x, y);
-        this.area.setLocation(areaX, areaY);
-
+        this.pos = new Point(x, y);
+        this.area = new Point(areaX, areaY);
         this.direction = direction;
+        this.blocks = new LinkedList<>();
     }
 
-    public Point getPos() {
+    public Point getPosition() {
         return this.pos;
     }
 
@@ -38,55 +36,50 @@ public class Rover {
         return this.area;
     }
 
-    public Compass turn(String leftOrRight) {
-        if ("l".equalsIgnoreCase(leftOrRight)) {
-            this.direction = this.direction.left();
-        }else{
-            this.direction = this.direction.right();
-        }
+    public Compass left() {
+        this.direction = this.direction.left();
         return this.direction;
     }
 
+    public Compass right() {
+        this.direction = this.direction.right();
+        return this.direction;
+    }
 
     public Point forward(int step) {
-        switch (direction) {
-            case N: {
-                pos.setLocation(pos.x, pos.y + step * direction.getValue());
-                break;
-            }
-            case W: {
-                pos.setLocation(pos.x + step * direction.getValue(), pos.y);
-                break;
-            }
-            case S: {
-                pos.setLocation(pos.x, pos.y + step * direction.getValue());
-                break;
-            }
-            case E: {
-                pos.setLocation(pos.x + step * direction.getValue(), pos.y);
-                break;
-            }
+        if (Compass.N.equals(this.direction) || (Compass.S.equals(this.direction))) {
+            this.pos.setLocation(this.pos.x, this.pos.y + step * this.direction.getValue());
+        }else{
+            this.pos.setLocation(this.pos.x + step * this.direction.getValue(), this.pos.y);
         }
-        if (isInArea()){
-            pos.setLocation(resetXInArea(), resetYInArea());
+
+        if (isOutboundArea()){
+            resetIntoArea();
         }
-        return pos;
+        return this.pos;
+    }
+
+    private void resetIntoArea() {
+        this.pos.setLocation((this.pos.x%this.area.x+this.area.y)%this.area.x, (this.pos.y%this.area.y+this.area.y)%this.area.y);
+    }
+
+    private boolean isOutboundArea(){
+        return (this.pos.x < 0 || this.pos.x > this.area.x || this.pos.y < 0 || this.pos.y > this.area.y);
     }
 
     public Point back(int step) {
         return forward(-1 * step);
     }
 
-    private int resetYInArea() {
-        return abs((pos.y % area.y + area.y) % area.y);
+    public Point forward(){
+        return forward(1);
     }
 
-    private int resetXInArea() {
-        return abs(pos.x % area.x + area.x) % area.x;
+    public Point back() {
+        return forward(-1);
     }
 
-    private boolean isInArea() {
-        return (pos.x > area.x) || (pos.x < 0) || (pos.y > area.y) || (pos.y < 0);
+    public void addBlock(Point point) {
+        this.blocks.add(point);
     }
-
- }
+}
