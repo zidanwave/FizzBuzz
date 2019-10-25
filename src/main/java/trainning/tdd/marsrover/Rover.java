@@ -12,7 +12,7 @@ import java.util.List;
  * @Version 1.0
  */
 public class Rover {
-    private final Point pos;
+    private Point pos;
     private final Point area;
     private Compass direction;
     private List<Point> blocks;
@@ -46,17 +46,52 @@ public class Rover {
         return this.direction;
     }
 
-    public Point forward(int step) {
-        if (Compass.N.equals(this.direction) || (Compass.S.equals(this.direction))) {
-            this.pos.setLocation(this.pos.x, this.pos.y + step * this.direction.getValue());
-        }else{
-            this.pos.setLocation(this.pos.x + step * this.direction.getValue(), this.pos.y);
+    public Point forward() {
+        Point nextPos = moveOneStep(true);
+
+        if (!isMeetBlock(nextPos)){
+            this.pos = nextPos;
+            if (isOutboundArea()){
+                resetIntoArea();
+            }
         }
 
-        if (isOutboundArea()){
-            resetIntoArea();
-        }
         return this.pos;
+    }
+
+
+    public Point back() {
+        Point nextPos = moveOneStep(false);
+
+        if (!isMeetBlock(nextPos)){
+            this.pos = nextPos;
+            if (isOutboundArea()){
+                resetIntoArea();
+            }
+        }
+
+        return this.pos;
+    }
+
+
+    private boolean isMeetBlock(Point nextPos) {
+        for (Point p : this.blocks) {
+            if(p.equals(nextPos)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Point moveOneStep(boolean forward) {
+        Point result = new Point(0,0);
+        int step = forward ? 1 : -1;
+        if (Compass.N.equals(this.direction) || (Compass.S.equals(this.direction))) {
+            result.setLocation(this.pos.x, this.pos.y + step * this.direction.getValue());
+        }else{
+            result.setLocation(this.pos.x + step * this.direction.getValue(), this.pos.y);
+        }
+        return result;
     }
 
     private void resetIntoArea() {
@@ -68,16 +103,20 @@ public class Rover {
     }
 
     public Point back(int step) {
-        return forward(-1 * step);
+        for(int ix=0; ix<step; ix++) {
+            back();
+        }
+        return this.pos;
     }
 
-    public Point forward(){
-        return forward(1);
+    public Point forward(int step){
+        for(int ix=0; ix<step; ix++) {
+            forward();
+        }
+        return this.pos;
     }
 
-    public Point back() {
-        return forward(-1);
-    }
+
 
     public void addBlock(Point point) {
         this.blocks.add(point);

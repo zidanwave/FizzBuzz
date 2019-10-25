@@ -39,7 +39,8 @@ import java.awt.*;
  * 2.8 火星车N后退并超出探索区域
  * 2.9 火星车W方向前进并超出探索区域
  * 2.10 火星车W后退并超出探索区域
- * 2.11 火星车遇到障碍物时停止，返回坐标和方向（一个障碍物一个坐标）——这个需求没有实现
+ * 2.11 火星车前进时遇到障碍物时停止
+ * 2.12 火星车后退时遇到障碍物时停止
  * 3. RoverRemote:发送批量指令，如 "LLLL" 或："FRFFLBBBRFFF"
  * 3.1 左转4次，返回坐标和方向
  * 3.2 右转10次，返回坐标和方向
@@ -83,7 +84,11 @@ public class RoverTest {
     @Test
     public void test_rover_turn_left_4_times(){
         Rover rover = new Rover(3,3,10,10,Compass.N);
-        Assert.assertEquals(rover.left().left().left().left(), Compass.N);
+        rover.left();
+        rover.left();
+        rover.left();
+        rover.left();
+        Assert.assertEquals(rover.getDirection(), Compass.N);
     }
 
     //2.5 火星车前进1步
@@ -102,13 +107,13 @@ public class RoverTest {
     @Test
     public void test_rover_back_1_step(){
         Rover rover = new Rover(3,3,10,10,Compass.N);
-        Assert.assertEquals(rover.back(1), new Point(3, 3-1));
+        Assert.assertEquals(rover.back(), new Point(3, 3-1));
         rover = new Rover(3,3,10,10,Compass.E);
-        Assert.assertEquals(rover.back(1), new Point(3-1, 3));
+        Assert.assertEquals(rover.back(), new Point(3-1, 3));
         rover = new Rover(3,3,10,10,Compass.S);
-        Assert.assertEquals(rover.back(1), new Point(3, 3+1));
+        Assert.assertEquals(rover.back(), new Point(3, 3+1));
         rover = new Rover(3,3,10,10,Compass.W);
-        Assert.assertEquals(rover.back(1), new Point(3+1, 3));
+        Assert.assertEquals(rover.back(), new Point(3+1, 3));
     }
 
     //2.7 火星车N方向前进并超出探索区域
@@ -137,6 +142,25 @@ public class RoverTest {
     public void test_rover_W_back_outbound_area(){
         Rover rover = new Rover(3,3,10,10,Compass.W);
         Assert.assertEquals(rover.back(8), new Point(1,3));
+    }
+
+    //2.11 火星车前进时遇到障碍物时停止
+    @Test
+    public void test_rover_forward_meet_barrier(){
+        Rover rover = new Rover(3,3,10,10,Compass.N);
+        rover.addBlock(new Point(3,4));
+        Assert.assertEquals(rover.forward(), new Point(3,3));
+    }
+
+    //2.12 火星车后退时遇到障碍物时停止
+    @Test
+    public void test_rover_back_meet_barrier(){
+        Rover rover = new Rover(3,3,10,10,Compass.N);
+        rover.addBlock(new Point(5,5));
+        rover.addBlock(new Point(3,1));
+        rover.back();
+        rover.back();
+        Assert.assertEquals(rover.getPosition(), new Point(3,2));
     }
 
 
