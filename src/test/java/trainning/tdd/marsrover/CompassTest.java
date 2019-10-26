@@ -11,6 +11,7 @@ import org.testng.annotations.Test;
  * 1.2 右转为E
  * 1.3 左转4次为N
  * 1.4 右转4次为N
+ * 1.5 检查方向N及转向之后的value
  *
  * 耗时：20分钟
  * @Author chenzi

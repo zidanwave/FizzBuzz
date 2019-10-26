@@ -1,5 +1,6 @@
 package trainning.tdd.marsrover;
 
+import java.awt.*;
 import java.util.Arrays;
 
 /**
@@ -27,5 +28,9 @@ public class RoverRemote {
             }
         }
         return String.format("%d,%d,%s", rover.getPosition().x, rover.getPosition().y, rover.getDirection().name());
+    }
+
+    public void addBlock(Point point) {
+        rover.addBlock(point);
     }
 }
