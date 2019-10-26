@@ -1,31 +1,34 @@
 package trainning.tdd.marsrover;
 
 import java.awt.*;
-import java.util.*;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedList;
+
+import static trainning.tdd.marsrover.Compass.*;
 
 /**
  * @ClassName Rover
  * @Description TODO
  * @Author chenzi
- * @Date 2019/10/25
+ * @Date 2019/10/26
  * @Version 1.0
  */
 public class Rover {
-    private Point pos;
+    private final Point position;
     private final Point area;
     private Compass direction;
-    private List<Point> blocks;
+    private LinkedList<Point> blocks;
 
     public Rover(int x, int y, int areaX, int areaY, Compass direction) {
-        this.pos = new Point(x, y);
+        this.position = new Point(x, y);
         this.area = new Point(areaX, areaY);
         this.direction = direction;
         this.blocks = new LinkedList<>();
     }
 
     public Point getPosition() {
-        return this.pos;
+        return this.position;
     }
 
     public Compass getDirection() {
@@ -36,87 +39,76 @@ public class Rover {
         return this.area;
     }
 
-    public Compass left() {
+    public boolean left() {
         this.direction = this.direction.left();
-        return this.direction;
-    }
-
-    public Compass right() {
-        this.direction = this.direction.right();
-        return this.direction;
-    }
-
-    public Point forward() {
-        Point nextPos = moveOneStep(true);
-
-        if (!isMeetBlock(nextPos)){
-            this.pos = nextPos;
-            if (isOutboundArea()){
-                resetIntoArea();
-            }
-        }
-
-        return this.pos;
-    }
-
-
-    public Point back() {
-        Point nextPos = moveOneStep(false);
-
-        if (!isMeetBlock(nextPos)){
-            this.pos = nextPos;
-            if (isOutboundArea()){
-                resetIntoArea();
-            }
-        }
-
-        return this.pos;
-    }
-
-
-    private boolean isMeetBlock(Point nextPos) {
-        for (Point p : this.blocks) {
-            if(p.equals(nextPos)) {
-                return true;
-            }
-        }
         return false;
     }
 
-    private Point moveOneStep(boolean forward) {
-        Point result = new Point(0,0);
-        int step = forward ? 1 : -1;
-        if (Compass.N.equals(this.direction) || (Compass.S.equals(this.direction))) {
-            result.setLocation(this.pos.x, this.pos.y + step * this.direction.getValue());
-        }else{
-            result.setLocation(this.pos.x + step * this.direction.getValue(), this.pos.y);
+    public boolean right() {
+        this.direction = this.direction.right();
+        return false;
+    }
+
+    public boolean forward() {
+        boolean blocked = false;
+        Point nextPos = nextStep(1);
+        if (isOutbound(nextPos)){
+            nextPos.setLocation((nextPos.x+this.area.x)%this.area.x, (nextPos.y+this.area.y)%this.area.y);
         }
+
+        blocked = isBlocked(nextPos);
+        if (blocked){
+            nextPos = this.position;
+        }else {
+            this.position.setLocation(nextPos.x, nextPos.y);
+        }
+        return blocked;
+    }
+
+    public boolean back() {
+        boolean blocked = false;
+        Point nextPos = nextStep(-1);
+        if (isOutbound(nextPos)){
+            nextPos.setLocation((nextPos.x+this.area.x)%this.area.x, (nextPos.y+this.area.y)%this.area.y);
+        }
+
+        blocked = isBlocked(nextPos);
+        if (blocked){
+            nextPos = this.position;
+        }else {
+            this.position.setLocation(nextPos.x, nextPos.y);
+        }
+
+        return blocked;
+    }
+
+    private boolean isBlocked(Point curPos) {
+        boolean blocked = false;
+        Iterator it = this.blocks.iterator();
+        while(it.hasNext()){
+            Point point = (Point)it.next();
+            if (curPos.equals(point)){
+                blocked = true;
+                break;
+            }
+        }
+        return blocked;
+    }
+
+    private Point nextStep(int factor) {
+        Point result = new Point(0,0);
+        if (this.direction.equals(Compass.N) || this.direction.equals(Compass.S)){
+            result.setLocation(this.position.x, this.position.y+factor*this.direction.getValue());
+        }else{
+            result.setLocation(this.position.x+factor*this.direction.getValue(), this.position.y);
+        }
+
         return result;
     }
 
-    private void resetIntoArea() {
-        this.pos.setLocation((this.pos.x%this.area.x+this.area.y)%this.area.x, (this.pos.y%this.area.y+this.area.y)%this.area.y);
+    private boolean isOutbound(Point point){
+        return ((point.x < 0) || (point.y < 0) || (point.x > this.area.x) || (point.y > this.area.y));
     }
-
-    private boolean isOutboundArea(){
-        return (this.pos.x < 0 || this.pos.x > this.area.x || this.pos.y < 0 || this.pos.y > this.area.y);
-    }
-
-    public Point back(int step) {
-        for(int ix=0; ix<step; ix++) {
-            back();
-        }
-        return this.pos;
-    }
-
-    public Point forward(int step){
-        for(int ix=0; ix<step; ix++) {
-            forward();
-        }
-        return this.pos;
-    }
-
-
 
     public void addBlock(Point point) {
         this.blocks.add(point);

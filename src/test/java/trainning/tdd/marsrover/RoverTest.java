@@ -47,39 +47,42 @@ import java.awt.*;
  * 3.2 右转10次，返回坐标、方向和执行状态
  * 3.3 前进1步，右转，前进2步，左转，后退3步，右转，前进3步，返回坐标、方向和执行状态
  * 3.4 前进5步，右转，前进4步，左转，前进1步，碰到障碍物，返回坐标、方向和执行状态
+ *
  * @Author chenzi
- * @Date 2019/10/25
+ * @Date 2019/10/26
  * @Version 1.0
  */
 public class RoverTest {
     @Test
     public void test_rover_init(){
-        Rover rover = new Rover(3,3,10,10,Compass.N);
-        Assert.assertEquals(rover.getPosition(), new Point(3,3));
-        Assert.assertEquals(rover.getDirection(), Compass.N);
-        Assert.assertEquals(rover.getArea(), new Point(10,10));
+        Assert.assertEquals(new Rover(3,3,10,10,Compass.N).getPosition(), new Point(3,3));
+        Assert.assertEquals(new Rover(3,3,10,10,Compass.N).getDirection(), Compass.N);
+        Assert.assertEquals(new Rover(3,3,10,10,Compass.N).getArea(), new Point(10,10));
     }
 
     @Test
     public void test_rover_init_2(){
-        Rover rover = new Rover(2,2,20,20,Compass.W);
-        Assert.assertEquals(rover.getPosition(), new Point(2,2));
-        Assert.assertEquals(rover.getDirection(), Compass.W);
-        Assert.assertEquals(rover.getArea(), new Point(20,20));
+        Assert.assertEquals(new Rover(3,4,10,15,Compass.W).getPosition(), new Point(3,4));
+        Assert.assertEquals(new Rover(3,4,10,15,Compass.W).getDirection(), Compass.W);
+        Assert.assertEquals(new Rover(3,4,10,15,Compass.W).getArea(), new Point(10,15));
     }
 
     @Test
     public void test_rover_turn_left(){
         Rover rover = new Rover(3,3,10,10,Compass.N);
-        Assert.assertEquals(rover.left(), Compass.W);
-        Assert.assertEquals(rover.left(), Compass.S);
+        rover.left();
+        Assert.assertEquals(rover.getDirection(), Compass.W);
+        rover.left();
+        Assert.assertEquals(rover.getDirection(), Compass.S);
     }
 
     @Test
     public void test_rover_turn_right(){
         Rover rover = new Rover(3,3,10,10,Compass.N);
-        Assert.assertEquals(rover.right(), Compass.E);
-        Assert.assertEquals(rover.right(), Compass.S);
+        rover.right();
+        Assert.assertEquals(rover.getDirection(), Compass.E);
+        rover.right();
+        Assert.assertEquals(rover.getDirection(), Compass.S);
     }
 
     //2.4 火星车连续左转4次
@@ -93,77 +96,92 @@ public class RoverTest {
         Assert.assertEquals(rover.getDirection(), Compass.N);
     }
 
-    //2.5 火星车前进1步
+    //2.5 火星车前进1步，左转，前进，左转，前进，左转，前进
     @Test
-    public void test_rover_forward_1_step(){
+    public void test_rover_forward_4_directions(){
         Rover rover = new Rover(3,3,10,10,Compass.N);
-        Assert.assertEquals(rover.forward(1), new Point(3, 4));
+        rover.forward();
+        Assert.assertEquals(rover.getPosition(), new Point(3, 4));
         rover.left();
-        Assert.assertEquals(rover.forward(1), new Point(3 - 1, 4));
+        rover.forward();
+        Assert.assertEquals(rover.getPosition(), new Point(2, 4));
         rover.left();
-        Assert.assertEquals(rover.forward(1), new Point(2, 4 - 1));
+        rover.forward();
+        Assert.assertEquals(rover.getPosition(), new Point(2, 3));
         rover.left();
-        Assert.assertEquals(rover.forward(1), new Point(2+1, 3));
+        rover.forward();
+        Assert.assertEquals(rover.getPosition(), new Point(3, 3));
     }
-    //2.6 火星车后退1步
+
+    //2.6 火星车4个方向各后退1步
     @Test
-    public void test_rover_back_1_step(){
+    public void test_rover_back_4_directions(){
         Rover rover = new Rover(3,3,10,10,Compass.N);
-        Assert.assertEquals(rover.back(), new Point(3, 3-1));
+        rover.back();
+        Assert.assertEquals(rover.getPosition(), new Point(3, 2));
         rover = new Rover(3,3,10,10,Compass.E);
-        Assert.assertEquals(rover.back(), new Point(3-1, 3));
+        rover.back();
+        Assert.assertEquals(rover.getPosition(), new Point(2,3));
         rover = new Rover(3,3,10,10,Compass.S);
-        Assert.assertEquals(rover.back(), new Point(3, 3+1));
+        rover.back();
+        Assert.assertEquals(rover.getPosition(), new Point(3,4));
         rover = new Rover(3,3,10,10,Compass.W);
-        Assert.assertEquals(rover.back(), new Point(3+1, 3));
+        rover.back();
+        Assert.assertEquals(rover.getPosition(), new Point(4,3));
     }
 
     //2.7 火星车N方向前进并超出探索区域
     @Test
-    public void test_rover_N_forward_outbound_area(){
-        Rover rover = new Rover(3,3,10,10,Compass.N);
-        Assert.assertEquals(rover.forward(8), new Point(3, 1));
+    public void test_rover_forward_outbound_area(){
+        Rover rover = new Rover(3,9,10,10,Compass.N);
+        rover.forward();
+        Assert.assertEquals(rover.getPosition(), new Point(3, 10));
+        rover.forward();
+        Assert.assertEquals(rover.getPosition(), new Point(3, 1));
     }
 
     //2.8 火星车N后退并超出探索区域
     @Test
-    public void test_rover_N_back_outbound_area(){
-        Rover rover = new Rover(3,3,10,10,Compass.N);
-        Assert.assertEquals(rover.back(8), new Point(3,5));
+    public void test_rover_back_outbound_area(){
+        Rover rover = new Rover(3,1,10,10,Compass.N);
+        rover.back();
+        Assert.assertEquals(rover.getPosition(), new Point(3, 0));
+        rover.back();
+        Assert.assertEquals(rover.getPosition(), new Point(3, 9));
+        rover = new Rover(1,1,10,10,Compass.E);
+        rover.back();
+        Assert.assertEquals(rover.getPosition(), new Point(0, 1));
+        rover.back();
+        Assert.assertEquals(rover.getPosition(), new Point(9, 1));
     }
 
     //2.9 火星车W方向前进并超出探索区域
     @Test
-    public void test_rover_W_forward_outbound_area(){
-        Rover rover = new Rover(3,3,10,10,Compass.W);
-        Assert.assertEquals(rover.forward(8), new Point(5, 3));
-    }
-
-    //2.10 火星车W后退并超出探索区域
-    @Test
-    public void test_rover_W_back_outbound_area(){
-        Rover rover = new Rover(3,3,10,10,Compass.W);
-        Assert.assertEquals(rover.back(8), new Point(1,3));
+    public void test_rover_forward_W_outbound_area() {
+        Rover rover = new Rover(1, 1, 11, 10, Compass.W);
+        rover.forward();
+        Assert.assertEquals(rover.getPosition(), new Point(0, 1));
+        rover.forward();
+        Assert.assertEquals(rover.getPosition(), new Point(10, 1));
     }
 
     //2.11 火星车前进时遇到障碍物时停止
     @Test
-    public void test_rover_forward_meet_barrier(){
-        Rover rover = new Rover(3,3,10,10,Compass.N);
-        rover.addBlock(new Point(3,4));
-        Assert.assertEquals(rover.forward(), new Point(3,3));
+    public void test_rover_forward_block() {
+        Rover rover = new Rover(3,1,10,10,Compass.N);
+        rover.addBlock(new Point(3,3));
+        rover.forward();
+        Assert.assertEquals(rover.getPosition(), new Point(3, 2));
+        rover.forward();
+        Assert.assertEquals(rover.getPosition(), new Point(3,2));
     }
 
     //2.12 火星车后退时遇到障碍物时停止
     @Test
-    public void test_rover_back_meet_barrier(){
-        Rover rover = new Rover(3,3,10,10,Compass.N);
-        rover.addBlock(new Point(5,5));
-        rover.addBlock(new Point(3,1));
+    public void test_rover_back_block() {
+        Rover rover = new Rover(3,1,10,10,Compass.N);
+        rover.addBlock(new Point(3,0));
         rover.back();
-        rover.back();
-        Assert.assertEquals(rover.getPosition(), new Point(3,2));
+        Assert.assertEquals(rover.getPosition(), new Point(3,1));
     }
-
-
 }
