@@ -50,10 +50,22 @@ public class Rover {
     }
 
     public boolean forward() {
+        return forward(1);
+    }
+
+    public boolean back() {
+        return forward(-1);
+    }
+
+    public void addBlock(Point point) {
+        this.blocks.add(point);
+    }
+
+    private boolean forward(int factor) {
         boolean blocked = false;
-        Point nextPos = nextStep(1);
+        Point nextPos = nextStep(factor);
         if (isOutbound(nextPos)){
-            nextPos.setLocation((nextPos.x+this.area.x)%this.area.x, (nextPos.y+this.area.y)%this.area.y);
+            nextPos = resetIntoArea(nextPos);
         }
 
         blocked = isBlocked(nextPos);
@@ -65,21 +77,10 @@ public class Rover {
         return blocked;
     }
 
-    public boolean back() {
-        boolean blocked = false;
-        Point nextPos = nextStep(-1);
-        if (isOutbound(nextPos)){
-            nextPos.setLocation((nextPos.x+this.area.x)%this.area.x, (nextPos.y+this.area.y)%this.area.y);
-        }
-
-        blocked = isBlocked(nextPos);
-        if (blocked){
-            nextPos = this.position;
-        }else {
-            this.position.setLocation(nextPos.x, nextPos.y);
-        }
-
-        return blocked;
+    private Point resetIntoArea(Point point) {
+        Point result = new Point(0,0);
+        result.setLocation((point.x+this.area.x)%this.area.x, (point.y+this.area.y)%this.area.y);
+        return result;
     }
 
     private boolean isBlocked(Point curPos) {
@@ -110,7 +111,4 @@ public class Rover {
         return ((point.x < 0) || (point.y < 0) || (point.x > this.area.x) || (point.y > this.area.y));
     }
 
-    public void addBlock(Point point) {
-        this.blocks.add(point);
-    }
 }
