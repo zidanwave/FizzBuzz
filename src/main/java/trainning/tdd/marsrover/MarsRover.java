@@ -7,36 +7,40 @@ import java.util.Arrays;
  * @ClassName MarsRover
  * @Description TODO
  * @Author chenzi
- * @Date 2019/10/27
+ * @Date 2019/11/4
  * @Version 1.0
  */
 public class MarsRover {
+
     private final Rover rover;
 
-    public MarsRover(int x, int y, int areaX, int areaY, Compass direction, String blocks) {
-        this.rover = new Rover(x,y,areaX,areaY,direction);
+    public MarsRover(Rover rover, String blocks) {
+        this.rover = rover;
         if (blocks == null) {
             return;
-        }else if(!blocks.trim().contains(",")){
+        }else if (!blocks.trim().contains(",")){
             return;
         }
-        Arrays.asList(blocks.split(" ")).stream().forEach(e -> {
-            String[] xy = e.split(",");
-            int xx = Integer.valueOf(xy[0]);
-            int yy = Integer.valueOf(xy[1]);
-            rover.addBlock(new Point(xx,yy));
+        Arrays.asList(blocks.split(" ")).stream().forEach(block->{
+            String[] xy = block.split(",");
+            this.rover.addBlock(Integer.valueOf(xy[0]), Integer.valueOf(xy[1]));
         });
     }
 
     public String receiveCommands(String commands) {
         int steps = 0;
         boolean blocked = false;
-        for(char cmd : commands.toCharArray()){
+        char[] cmdArray = commands.toUpperCase().toCharArray();
+        for (char cmd : cmdArray){
             switch (cmd){
-                case 'L': blocked = rover.left();break;
-                case 'R': blocked = rover.right();break;
-                case 'F': blocked = rover.forward();break;
-                case 'B': blocked = rover.back();break;
+                case 'L':
+                    blocked = rover.left(); break;
+                case 'R':
+                    blocked = rover.right(); break;
+                case 'F':
+                    blocked = rover.forward(); break;
+                case 'B':
+                    blocked = rover.back(); break;
             }
             if (blocked){
                 break;
@@ -44,6 +48,17 @@ public class MarsRover {
                 steps++;
             }
         }
-        return String.format("x:%d,y:%d,direction:%s,steps:%d", rover.getPosition().x, rover.getPosition().y, rover.getDirection(), steps);
+        return String.format("%d,%d,%s,%d", rover.getPosition().x, rover.getPosition().y, rover.getDirection(), steps);
+    }
+
+    public boolean containsBlock(String ps) {
+        if (ps == null) {
+            return false;
+        }else if (!ps.trim().contains(",")){
+            return false;
+        }
+        String[] xy = ps.split(",");
+        Point block = new Point(Integer.valueOf(xy[0]), Integer.valueOf(xy[1]));
+        return rover.containsBlock(block);
     }
 }
